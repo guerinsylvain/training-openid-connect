@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -16,7 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace ImageGallery.Client.Controllers
-{ 
+{
     [Authorize]
     public class GalleryController : Controller
     {
@@ -24,7 +25,7 @@ namespace ImageGallery.Client.Controllers
 
         public GalleryController(IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory ?? 
+            _httpClientFactory = httpClientFactory ??
                 throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
@@ -37,17 +38,17 @@ namespace ImageGallery.Client.Controllers
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
                 "/api/images/");
-            
+
             var response = await httpClient.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
             using (var responseStream = await response.Content.ReadAsStreamAsync())
-            {   
+            {
                 return View(new GalleryIndexViewModel(
                     await JsonSerializer.DeserializeAsync<List<Image>>(responseStream)));
-            }             
+            }
         }
 
         public async Task<IActionResult> EditImage(Guid id)
@@ -65,7 +66,7 @@ namespace ImageGallery.Client.Controllers
             response.EnsureSuccessStatusCode();
 
             using (var responseStream = await response.Content.ReadAsStreamAsync())
-            { 
+            {
                 var deserializedImage = await JsonSerializer.DeserializeAsync<Image>(responseStream);
 
                 var editImageViewModel = new EditImageViewModel()
@@ -75,7 +76,7 @@ namespace ImageGallery.Client.Controllers
                 };
 
                 return View(editImageViewModel);
-            }     
+            }
         }
 
         [HttpPost]
@@ -88,8 +89,10 @@ namespace ImageGallery.Client.Controllers
             }
 
             // create an ImageForUpdate instance
-            var imageForUpdate = new ImageForUpdate() { 
-                Title = editImageViewModel.Title };
+            var imageForUpdate = new ImageForUpdate()
+            {
+                Title = editImageViewModel.Title
+            };
 
             // serialize it
             var serializedImageForUpdate = JsonSerializer.Serialize(imageForUpdate);
@@ -104,13 +107,13 @@ namespace ImageGallery.Client.Controllers
                 serializedImageForUpdate,
                 System.Text.Encoding.Unicode,
                 "application/json");
-            
+
             var response = await httpClient.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
-            return RedirectToAction("Index");       
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> DeleteImage(Guid id)
@@ -155,7 +158,7 @@ namespace ImageGallery.Client.Controllers
 
             // take the first (only) file in the Files list
             var imageFile = addImageViewModel.Files.First();
-             
+
             if (imageFile.Length > 0)
             {
                 using (var fileStream = imageFile.OpenReadStream())
@@ -167,8 +170,8 @@ namespace ImageGallery.Client.Controllers
             }
 
             // serialize it
-            var serializedImageForCreation = JsonSerializer.Serialize(imageForCreation);  
-            
+            var serializedImageForCreation = JsonSerializer.Serialize(imageForCreation);
+
             var httpClient = _httpClientFactory.CreateClient("APIClient");
 
             var request = new HttpRequestMessage(
@@ -186,6 +189,36 @@ namespace ImageGallery.Client.Controllers
             response.EnsureSuccessStatusCode();
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> OrderFrame()
+        {
+            var idpClient = _httpClientFactory.CreateClient("IDPClient");
+
+            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync();
+
+            if (metaDataResponse.IsError)
+            {
+                throw new Exception("Problem accessing the discovery endpoint.", metaDataResponse.Exception);
+            }
+
+            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+            var userInfoResponse = await idpClient.GetUserInfoAsync(
+                new UserInfoRequest
+                {
+                    Address = metaDataResponse.UserInfoEndpoint,
+                    Token = accessToken
+                });
+
+            if (userInfoResponse.IsError)
+            {
+                throw new Exception("Problem accessing the UserInfo endpoint.", userInfoResponse.Exception);
+            }
+
+            var address = userInfoResponse.Claims.FirstOrDefault(c => c.Type == "address")?.Value;
+
+            return View(new OrderFrameViewModel(address));
         }
 
         public async Task WriteOutIdentityInformation()
