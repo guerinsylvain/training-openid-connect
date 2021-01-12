@@ -6,10 +6,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ImageGallery.Client
 {
@@ -50,7 +52,10 @@ namespace ImageGallery.Client
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
                 })
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    options.AccessDeniedPath = "/Authorization/AccessDenied";
+                })
                 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -68,6 +73,11 @@ namespace ImageGallery.Client
                     options.SaveTokens = true;
                     options.ClientSecret = "secret";
                     options.GetClaimsFromUserInfoEndpoint = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = JwtClaimTypes.GivenName,
+                        RoleClaimType = JwtClaimTypes.Role
+                    };
                 });
         }
 
