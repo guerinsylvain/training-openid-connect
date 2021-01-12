@@ -33,6 +33,7 @@ namespace Marvin.IDP
                 ClientName = "Image Gallery",
                 ClientId = "imagegalleryclient",
                 AllowedGrantTypes = GrantTypes.Code,
+                RequireConsent = true,
                 RequirePkce = true,
                 RedirectUris = new List<string>()
                 {
