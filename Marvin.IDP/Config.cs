@@ -12,7 +12,7 @@ namespace Marvin.IDP
     {
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
-            { 
+            {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile()
             };
@@ -32,6 +32,10 @@ namespace Marvin.IDP
                 RedirectUris = new List<string>()
                 {
                     "https://localhost:44389/signin-oidc"
+                },
+                PostLogoutRedirectUris = new List<string>()
+                {
+                    "https://localhost:44389/signout-callback-oidc"
                 },
                 AllowedScopes =
                 {
