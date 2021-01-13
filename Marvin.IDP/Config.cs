@@ -4,12 +4,14 @@
 
 using IdentityServer4.Models;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using IdentityServer4;
 
 namespace Marvin.IDP
 {
     public static class Config
     {
+        // Scopes listed under IdentityResources are the scopes that will be included in the ID-token.
         public static IEnumerable<IdentityResource> IdentityResources =>
             new IdentityResource[]
             {
@@ -22,9 +24,22 @@ namespace Marvin.IDP
                     new List<string>() { "role" }),
             };
 
+
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
-            { };
+            {
+                new ApiScope(
+                    "imagegalleryapi",
+                    "Image Gallery API scope")
+            };
+
+        public static IEnumerable<ApiResource> ApiResources =>
+            new ApiResource[] {
+                new ApiResource("imagegalleryapi", "Image Gallery API")
+                {
+                    Scopes = { "imagegalleryapi"}
+                }
+            };
 
         public static IEnumerable<Client> Clients =>
             new Client[]
@@ -48,7 +63,8 @@ namespace Marvin.IDP
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Address,
-                    "roles"
+                    "roles",
+                    "imagegalleryapi"
                 },
                 ClientSecrets =
                 {
