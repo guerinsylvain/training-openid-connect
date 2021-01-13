@@ -37,7 +37,8 @@ namespace Marvin.IDP
             new ApiResource[] {
                 new ApiResource("imagegalleryapi", "Image Gallery API")
                 {
-                    Scopes = { "imagegalleryapi"}
+                    Scopes = { "imagegalleryapi"},
+                    UserClaims = new List<string>() {"role"}
                 }
             };
 
