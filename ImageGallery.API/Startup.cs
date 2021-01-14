@@ -28,6 +28,8 @@ namespace ImageGallery.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //  The access token validation middleware, at the API level, takes a 5‑minute queue into account. It does this to handle small offsets in out‑of‑sync clock times between the identity provider and API servers.
+
             services.AddControllers()
                      .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
