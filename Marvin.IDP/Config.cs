@@ -12,7 +12,7 @@ namespace Marvin.IDP
     public static class Config
     {
         // Scopes listed under IdentityResources are the scopes that will be included in the ID-token.
-        public static IEnumerable<IdentityResource> IdentityResources =>
+        public static IEnumerable<IdentityResource> Ids =>
             new IdentityResource[]
             {
                 new IdentityResources.OpenId(),
