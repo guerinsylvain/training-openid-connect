@@ -2,7 +2,7 @@
 
 ## Pluralsight
 
-training from pluralsight:
+training from pluralsight:  
 https://app.pluralsight.com/library/courses/securing-aspnet-core-3-oauth2-openid-connect/table-of-contents
 
 ## Some notes
@@ -14,7 +14,7 @@ add-migration -name InitialIdentityServerConfigurationDBMigration -context Persi
 
 ## SPA Considerations
 
-Because this training is showcasing an asp.net server-side application.
+Because this training is showcasing an asp.net server-side application...
 
 ### Why not Implicit Flow?
 
@@ -37,3 +37,5 @@ Because It does not expose access token to the browser in URL and you don't need
 PKCE stands for Proof Key for Code Exchange.
 
 In this case, the /token endpoint is not protected by Token Endpoint authentication methods. Because of PCKE, OP Server use code_challenge and code_verifier to verify request. So you need to remove auth methods for token endpoint using your OpenID connect server admin panel.
+
+![Authorization Code PKCE Flow](https://github.com/guerinsylvain/training-openid-connect/blob/main/Misc/authorization%20code%20PKCE%20flow.png)
