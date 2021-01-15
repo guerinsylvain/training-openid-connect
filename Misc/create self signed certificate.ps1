@@ -1,0 +1,1 @@
+New-SelfSignedCertificate -Subject "CN=MarvinIdSrvSigningCert" -CertStoreLocation "Cert:\LocalMachine\My"
