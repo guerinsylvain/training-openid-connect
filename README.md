@@ -8,6 +8,8 @@ https://app.pluralsight.com/library/courses/securing-aspnet-core-3-oauth2-openid
 ## Some notes
 
 dotnet new -i IdentityServer4.Templates
+dotnet new is4empty -n Marvin.IDP
+dotnet new is4ui
 
 New-SelfSignedCertificate -Subject "CN=MarvinIdSrvSigningCert" -CertStoreLocation "Cert:\LocalMachine\My"
 
